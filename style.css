@@ -1,9 +1,23 @@
 :root{
 	--main-bg-color: rgb(31, 37, 38);
+	--main-sec-color: rgb(67, 88, 82);
 	--main-card-color: rgb(50, 71, 72);
 	--main-font-color: beige;
 
+	--main-focus-bg: rgb(197, 138, 112);
+	--main-focus-sec-bg:rgb(144, 121, 112);
+
 	--main-act-card-color: rgb(80, 123, 109);
+
+	--succ-pop-up-bgc: rgb(95, 140, 60);
+	--succ-pop-up-border-color: rgb(203, 225, 81);
+
+	--box-shadow: rgba(29, 29, 29, 0.6);
+}
+
+html, body{
+	scrollbar-width: none;
+	overflow-x: hidden;
 }
 
 body{
@@ -29,12 +43,43 @@ h1, h3{
 }
 
 .player1, .player2{
+	padding: 10px;
 	background-color: var(--main-card-color);
 	text-align: center;
 	font-size: 32px;
 	min-width: 300px;
-	padding-left: 1em;
 	border-radius: 30px;
+}
+
+.result-message{
+	position: absolute;
+	min-width: 300px;
+	text-align: center;
+	top: 100%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: var(--succ-pop-up-bgc);
+	padding: 1em;
+	border-radius: 1em;
+	border: solid 2px var(--succ-pop-up-border-color);
+	box-shadow: 5px 5px 5px var(--box-shadow);
+	display: none;
+}
+
+.result-pop-in{
+	animation: pop-up-move-up 3s ease-in;
+	transition: opacity 0.5 ease-in;
+}
+
+@keyframes pop-up-move-up{
+	0%   {
+		top: 100%;
+		opacity: 1;
+	}
+  100% {
+		top: 0;
+		opacity: 0;
+	}
 }
 
 .curPlayer{
@@ -47,8 +92,8 @@ h1, h3{
 
 .grid{
 	margin: auto;
-	height: 500px;
-	width: 500px;
+	height: 400px;
+	width: 400px;
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	grid-template-rows: repeat(3, 1fr);
@@ -57,7 +102,7 @@ h1, h3{
 
 .ttt-card{
 	background-color: var(--main-card-color);
-	box-shadow: 5px 5px 5px rgba(29, 29, 29, 0.6);
+	box-shadow: 5px 5px 5px var(--box-shadow);
 	display: grid;
 	align-items: center;
 	justify-content: center;
@@ -72,4 +117,47 @@ h1, h3{
 
 .points{
 	min-height: 100px;
+}
+
+.clear-but-container{
+	display: flex;
+	width: 100vw;
+	flex-direction: column;
+	margin-top: 16px;
+}
+
+.clear-board{
+	align-self: center;
+	justify-self: center;
+	padding: 1em;
+	background-color: var(--main-act-card-color);
+	border: none;
+	color: white;
+	border-radius: 1em;
+	cursor: pointer;
+	box-shadow: 4px 4px 4px var(--box-shadow);
+}
+
+.change-name{
+	background-color: var(--main-bg-color);
+	border-style: none;
+	border-radius: 1em;
+	border: solid 2px var(--main-sec-color);
+	color: var(--main-font-color);
+}
+
+.change-name:focus{
+	outline: none;
+	background-color: var(--main-focus-bg);
+	border: solid 2px var(--main-focus-sec-bg);
+}
+
+.submit-name{
+	background-color: var(--main-bg-color);
+	border-style: none;
+	border-radius: 1em;
+	border: solid 2px var(--main-sec-color);
+	color: var(--main-font-color);
+	padding: 1em;
+	cursor: pointer;
 }

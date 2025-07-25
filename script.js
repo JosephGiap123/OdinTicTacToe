@@ -2,11 +2,13 @@ function createPlayer(name, tick){
 
 	let score = 0;
 	const incrementScore = () => ++score;
+	const resetScore = () => score = 0;
 	const getScore = () => score;
 	const getName  = () => name;
 	const getTick = () => tick;
+	const changeName = (newName) => name = newName;
 
-	return {incrementScore, getScore, getName, getTick}
+	return {incrementScore, getScore, getName, getTick, changeName, resetScore}
 }
 
 const GameBoard = (function(){
@@ -90,9 +92,11 @@ const GameManager = (function(GameBoard){ //game logic here!
 				case 'WIN':
 					curPlayer.incrementScore();
 					GameBoard.clearBoard();
+					_renderMessage(status, curPlayer);
 					break;
 				case 'TIE':
 					GameBoard.clearBoard();
+					_renderMessage(status, curPlayer);
 					break;
 			}
 	}
@@ -104,10 +108,16 @@ const GameManager = (function(GameBoard){ //game logic here!
 			manageGame(curPlayer, gameStatus);
 			curPlayer = otherPlayer(curPlayer);
 			_renderBoard();
-			_renderPoints();
+			updatePlayerInfo();
 			_renderActivePlayer();
 		}
 		else console.log("ERROR IN CLICKING");
+	}
+
+	const clearBoardOnDOM = () => {
+		GameBoard.clearBoard();
+		_renderBoard();
+		_renderMessage('CLEAR');
 	}
 
 	const _renderBoard = () => { 
@@ -122,9 +132,9 @@ const GameManager = (function(GameBoard){ //game logic here!
 		});	
 	}
 
-	const _renderPoints = () =>{
-		const player1Card = document.querySelector('.player1');
-		const player2Card = document.querySelector('.player2');
+	const updatePlayerInfo = () =>{
+		const player1Card = document.querySelector('.player1-text');
+		const player2Card = document.querySelector('.player2-text');
 		player1Card.innerHTML = `${player1.getName()}:<br>${player1.getScore()}`;
 		player2Card.innerHTML = `${player2.getName()}:<br>${player2.getScore()}`;
 	}
@@ -138,14 +148,34 @@ const GameManager = (function(GameBoard){ //game logic here!
 		else player2Card.classList.add('curPlayer');
 	}
 
+	const _renderMessage = (message, winningPlayer) =>{
+		const messageDiv = document.querySelector('.result-message');
+		switch(message){
+			case 'WIN':
+				messageDiv.textContent = `${winningPlayer.getName()} has won this game!`;
+				break;
+			case 'TIE':
+				messageDiv.textContent = `Tic Tac Toe game has resulted in a tie!`;
+				break;
+			case 'CLEAR':
+				messageDiv.textContent = `Tic Tac Toe board has been cleared`;
+				break;
+		}
+		messageDiv.style.display = 'block';
+
+		messageDiv.classList.remove('result-pop-in');
+		void messageDiv.offsetWidth; // force reflow
+		messageDiv.classList.add('result-pop-in');
+	}
+
 	let player1 = createPlayer("Player 1", "X");
 	let player2 = createPlayer("Player 2", "O");
 	let curPlayer = player1;
 	_renderBoard();
-	_renderPoints();
+	updatePlayerInfo();
 	_renderActivePlayer();
 
-	return {player1, player2, curPlayer, clickedButton, printScores};
+	return {player1, player2, curPlayer, clickedButton, printScores, clearBoardOnDOM, updatePlayerInfo};
 })(GameBoard);
 
 document.querySelectorAll('.ttt-card').forEach((card)=>{
@@ -155,4 +185,28 @@ document.querySelectorAll('.ttt-card').forEach((card)=>{
 		const y = parseInt(card.dataset.row);
 		GameManager.clickedButton(x,y);
 	});
+});
+
+//animation
+document.querySelector('.result-message').addEventListener('animationend', (event) => {
+	const msgDiv = event.target;
+	msgDiv.classList.remove('result-pop-in');
+	msgDiv.style.display = 'none';
+	msgDiv.style.top = '100%';
+});
+
+document.querySelector('.clear-board').addEventListener('click', GameManager.clearBoardOnDOM);
+
+document.querySelectorAll('.player-form').forEach((form)=>{addEventListener('submit', (event)=>{
+		const form = event.target;
+		event.preventDefault();
+		const data = new FormData(form);
+		const newName = data.get('newName');
+		const playerNum = form.dataset.player;
+		if(newName.length > 2 && newName.length < 50){
+			GameManager[playerNum].changeName(newName);
+			GameManager.updatePlayerInfo();
+		}
+		form.reset();
+	})
 });
