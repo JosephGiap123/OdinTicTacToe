@@ -91,30 +91,35 @@ const GameManager = (function(GameBoard){ //game logic here!
 			switch(status){
 				case 'WIN':
 					curPlayer.incrementScore();
-					GameBoard.clearBoard();
+					// GameBoard.clearBoard();
+					playable = false;
 					_renderMessage(status, curPlayer);
 					break;
 				case 'TIE':
-					GameBoard.clearBoard();
+					// GameBoard.clearBoard();
+					playable = false;
 					_renderMessage(status, curPlayer);
 					break;
 			}
 	}
 
 	const clickedButton = (x,y) =>{
-		const tick = curPlayer.getTick();
-		if(GameBoard.placeOnBoard(tick, x, y)){ //successfully placed
-			const gameStatus = checkGameStatus();
-			manageGame(curPlayer, gameStatus);
-			curPlayer = otherPlayer(curPlayer);
-			_renderBoard();
-			updatePlayerInfo();
-			_renderActivePlayer();
+		if(playable){
+			const tick = curPlayer.getTick();
+			if(GameBoard.placeOnBoard(tick, x, y)){ //successfully placed
+				const gameStatus = checkGameStatus();
+				manageGame(curPlayer, gameStatus);
+				curPlayer = otherPlayer(curPlayer);
+				_renderBoard();
+				updatePlayerInfo();
+				_renderActivePlayer();
+			}
+			else console.log("ERROR IN CLICKING");
 		}
-		else console.log("ERROR IN CLICKING");
 	}
 
 	const clearBoardOnDOM = () => {
+		playable = true;
 		GameBoard.clearBoard();
 		_renderBoard();
 		_renderMessage('CLEAR');
@@ -171,6 +176,7 @@ const GameManager = (function(GameBoard){ //game logic here!
 	let player1 = createPlayer("Player 1", "X");
 	let player2 = createPlayer("Player 2", "O");
 	let curPlayer = player1;
+	let playable = true;
 	_renderBoard();
 	updatePlayerInfo();
 	_renderActivePlayer();
