@@ -32,9 +32,10 @@ h1, h3{
 .points{
 	text-align: center;
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 1fr 100px 1fr;
 	margin-bottom: 2em;
 }
+
 .player1{
 	justify-self: start;
 }
