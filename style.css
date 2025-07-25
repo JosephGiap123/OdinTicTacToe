@@ -1,0 +1,75 @@
+:root{
+	--main-bg-color: rgb(31, 37, 38);
+	--main-card-color: rgb(50, 71, 72);
+	--main-font-color: beige;
+
+	--main-act-card-color: rgb(80, 123, 109);
+}
+
+body{
+	color: var(--main-font-color);
+	background-color: var(--main-bg-color);
+}
+
+h1, h3{
+	text-align: center;
+}
+
+.points{
+	text-align: center;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	margin-bottom: 2em;
+}
+.player1{
+	justify-self: start;
+}
+.player2{
+	justify-self: end;
+}
+
+.player1, .player2{
+	background-color: var(--main-card-color);
+	text-align: center;
+	font-size: 32px;
+	min-width: 300px;
+	padding-left: 1em;
+	border-radius: 30px;
+}
+
+.curPlayer{
+	background-color: var(--main-act-card-color);
+}
+
+.active{
+	background-color: var(--main-act-card-color);
+}
+
+.grid{
+	margin: auto;
+	height: 500px;
+	width: 500px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	gap: 1em;
+}
+
+.ttt-card{
+	background-color: var(--main-card-color);
+	box-shadow: 5px 5px 5px rgba(29, 29, 29, 0.6);
+	display: grid;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-size: 60px;
+}
+
+.text{
+	font-size: 60px;
+	text-align: center;
+}
+
+.points{
+	min-height: 100px;
+}

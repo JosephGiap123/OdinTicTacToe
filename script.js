@@ -9,7 +9,7 @@ function createPlayer(name, tick){
 	return {incrementScore, getScore, getName, getTick}
 }
 
-const gameBoard = (function(){
+const GameBoard = (function(){
 	let boardState = Array.from(Array(3), () => new Array(3).fill('.'));
 
 	const clearBoard = () =>{
@@ -17,6 +17,8 @@ const gameBoard = (function(){
 	}
 
 	const placeOnBoard = (tick, x, y) => {
+		console.log(boardState);
+		console.log("trying to place");
 		if(boardState[y][x] != '.'){
 			console.log('Position is taken.');
 			return false; //not placed
@@ -51,19 +53,14 @@ const gameBoard = (function(){
 
 	const getBoard = () => boardState;
 
-	return {placeOnBoard, getBoard, clearBoard, checkForWin, checkFull}
+	const getTile = (x,y) => boardState[y][x];
+
+	return {placeOnBoard, getBoard, getTile, clearBoard, checkForWin, checkFull}
 })();
 
-const GameManager = (function(gameBoard){ //game logic here!
-	const prompt = require('prompt-sync')({sigint: true});
-	const _promptLocation = () =>{
-		const x = prompt("X LOCATION?");
-		const y = prompt("Y LOCATION?");
-		return {x, y};
-	}
-
-	const logBoard = () =>{
-		gameBoard.getBoard().forEach((row) =>{
+const GameManager = (function(GameBoard){ //game logic here!
+	const logBoard = () =>{ 
+		GameBoard.getBoard().forEach((row) =>{
 			console.log(`${row[0]} ${row[1]} ${row[2]}`);
 		})
 	}
@@ -79,10 +76,10 @@ const GameManager = (function(gameBoard){ //game logic here!
 	}
 
 	const checkGameStatus = () => {
-		if(gameBoard.checkForWin()){
+		if(GameBoard.checkForWin()){
 			return 'WIN';
 		}
-		else if(gameBoard.checkFull()){
+		else if(GameBoard.checkFull()){
 			return 'TIE';
 		}
 		else return 'N/A';
@@ -92,38 +89,70 @@ const GameManager = (function(gameBoard){ //game logic here!
 			switch(status){
 				case 'WIN':
 					curPlayer.incrementScore();
-					console.log(`${curPlayer.getName()} has won this Tic Tac Toe game.`)
-					gameBoard.clearBoard();
-					printScores(); //later to be replaced.
+					GameBoard.clearBoard();
 					break;
 				case 'TIE':
-					console.log('This game results in a TIE');
-					gameBoard.clearBoard();
+					GameBoard.clearBoard();
 					break;
 			}
 	}
 
-	let player1 = createPlayer("Player1", "X");
-	let player2 = createPlayer("Player2", "O");
-	const maxScore = 10;
-	let curPlayer = player1;
-
-	logBoard();
-	while(player1.getScore() < maxScore && player2.getScore() < maxScore){
-		console.log(`${curPlayer.getName()}'s turn'`);
-		let madeMove = false;
-		while(!madeMove){
-			const tick = curPlayer.getTick();
-			let location = _promptLocation();
-			if(gameBoard.placeOnBoard(tick, location.x, location.y)){ // made move
-				madeMove = true;
-				const gameStatus = checkGameStatus();
-				console.log(gameStatus);
-				manageGame(curPlayer, gameStatus);
-				curPlayer = otherPlayer(curPlayer);
-			}
+	const clickedButton = (x,y) =>{
+		const tick = curPlayer.getTick();
+		if(GameBoard.placeOnBoard(tick, x, y)){ //successfully placed
+			const gameStatus = checkGameStatus();
+			manageGame(curPlayer, gameStatus);
+			curPlayer = otherPlayer(curPlayer);
+			_renderBoard();
+			_renderPoints();
+			_renderActivePlayer();
 		}
-		logBoard();
+		else console.log("ERROR IN CLICKING");
 	}
 
-})(gameBoard);
+	const _renderBoard = () => { 
+		const cards = document.querySelectorAll('.ttt-card');
+		cards.forEach((card)=>{ //set each cards content
+			const cardX = parseInt(card.dataset.col);
+			const cardY = parseInt(card.dataset.row);
+			if(GameBoard.getTile(cardX,cardY) != ".")
+				card.textContent = GameBoard.getTile(cardX, cardY);
+			else
+				card.textContent = "";
+		});	
+	}
+
+	const _renderPoints = () =>{
+		const player1Card = document.querySelector('.player1');
+		const player2Card = document.querySelector('.player2');
+		player1Card.innerHTML = `${player1.getName()}:<br>${player1.getScore()}`;
+		player2Card.innerHTML = `${player2.getName()}:<br>${player2.getScore()}`;
+	}
+
+	const _renderActivePlayer = () =>{
+		const player1Card = document.querySelector('.player1');
+		const player2Card = document.querySelector('.player2');
+		player1Card.classList.remove('curPlayer')
+		player2Card.classList.remove('curPlayer')
+		if(curPlayer === player1) player1Card.classList.add('curPlayer');
+		else player2Card.classList.add('curPlayer');
+	}
+
+	let player1 = createPlayer("Player 1", "X");
+	let player2 = createPlayer("Player 2", "O");
+	let curPlayer = player1;
+	_renderBoard();
+	_renderPoints();
+	_renderActivePlayer();
+
+	return {player1, player2, curPlayer, clickedButton, printScores};
+})(GameBoard);
+
+document.querySelectorAll('.ttt-card').forEach((card)=>{
+	card.addEventListener('click', ()=>{
+		console.log("hi");
+		const x = parseInt(card.dataset.col);
+		const y = parseInt(card.dataset.row);
+		GameManager.clickedButton(x,y);
+	});
+});
